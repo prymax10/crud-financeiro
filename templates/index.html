@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primo'sFinCntrl - Controle Financeiro</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Menu lateral -->
+            <div class="col-md-2 sidebar">
+                <div class="sidebar-header">
+                    <h3>Primo'sFinCntrl</h3>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#despesas">
+                            <i class="fas fa-money-bill-wave"></i> Despesas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#estatisticas">
+                            <i class="fas fa-chart-pie"></i> Estatísticas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Conteúdo principal -->
+            <div class="col-md-10 main-content">
+                <!-- Página de Despesas -->
+                <div id="despesas-page" class="content-page active">
+                    
+                    <!-- Card com total de despesas -->
+                    <div class="card mb-4 bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Despesas</h5>
+                            <h2 class="card-text" id="total-despesas">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- Abas de período -->
+                    <ul class="nav nav-tabs mb-3" id="periodoTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="hoje-tab" data-bs-toggle="tab" data-periodo="diario" type="button" role="tab">Hoje</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="semana-tab" data-bs-toggle="tab" data-periodo="semanal" type="button" role="tab">Semana</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mes-tab" data-bs-toggle="tab" data-periodo="mensal" type="button" role="tab">Mês</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ano-tab" data-bs-toggle="tab" data-periodo="anual" type="button" role="tab">Ano</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="todos-tab" data-bs-toggle="tab" data-periodo="todos" type="button" role="tab">Todos</button>
+                        </li>
+                    </ul>
+                    
+                    <!-- Botão Nova Despesa -->
+                    <div class="mb-3">
+                        <button id="btn-nova-despesa" class="btn btn-warning">
+                            <i class="fas fa-plus"></i> Nova Despesa
+                        </button>
+                    </div>
+                    
+                    <!-- Tabela de despesas -->
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Categoria</th>
+                                    <th>Data</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-despesas">
+                                <!-- Dados serão carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Página de Estatísticas -->
+                <div id="estatisticas-page" class="content-page">
+                    
+                    <!-- Card com total de despesas -->
+                    <div class="card mb-4 bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Despesas</h5>
+                            <h2 class="card-text" id="total-despesas-estatisticas">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- Abas de período -->
+                    <ul class="nav nav-tabs mb-3" id="periodoTabsEstatisticas" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="hoje-tab-est" data-bs-toggle="tab" data-periodo="diario" type="button" role="tab">Hoje</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="semana-tab-est" data-bs-toggle="tab" data-periodo="semanal" type="button" role="tab">Semana</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mes-tab-est" data-bs-toggle="tab" data-periodo="mensal" type="button" role="tab">Mês</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ano-tab-est" data-bs-toggle="tab" data-periodo="anual" type="button" role="tab">Ano</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="todos-tab-est" data-bs-toggle="tab" data-periodo="todos" type="button" role="tab">Todos</button>
+                        </li>
+                    </ul>
+                    
+                    <!-- Painéis de estatísticas -->
+                    <div class="row">
+                        <!-- Gráfico de pizza -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Despesas por Categoria
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="grafico-categorias"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Resumo por categoria -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    Resumo por Categoria
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group" id="lista-categorias">
+                                        <!-- Dados serão carregados via JavaScript -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Nova/Edição de Despesa -->
+    <div class="modal fade" id="modal-despesa" tabindex="-1" aria-labelledby="modalDespesaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDespesaLabel">Nova Despesa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-despesa">
+                        <input type="hidden" id="despesa-id">
+                        <div class="mb-3">
+                            <label for="despesa-descricao" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="despesa-descricao" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="despesa-valor" class="form-label">Valor</label>
+                            <input type="number" class="form-control" id="despesa-valor" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="despesa-categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="despesa-categoria" required>
+                                <!-- Opções serão carregadas via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="despesa-data" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="despesa-data" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" id="btn-salvar-despesa">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS e dependências -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Data Labels para mostrar porcentagens no gráfico -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <!-- Scripts da aplicação -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

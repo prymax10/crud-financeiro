@@ -1,0 +1,385 @@
+/**
+ * Estilos personalizados para a aplicação Primo'sFinCntrl
+ */
+
+/* Estilos gerais */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+/* Efeito de destaque para elementos interativos */
+.btn, .nav-link, .card, .table tr {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover, .nav-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilos do menu lateral */
+.sidebar {
+    background: linear-gradient(135deg, #343a40 0%, #121416 100%);
+    color: white;
+    min-height: 100vh;
+    padding: 20px 0;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.sidebar-header {
+    padding: 0 15px 20px;
+    border-bottom: 1px solid #495057;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    padding: 12px 18px;
+    margin: 8px 10px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.sidebar .nav-link:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: all 0.5s;
+    z-index: -1;
+}
+
+.sidebar .nav-link:hover:before {
+    left: 100%;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: white;
+    background-color: rgba(255, 193, 7, 0.2);
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+}
+
+/* Estilos do conteúdo principal */
+.main-content {
+    padding: 30px;
+}
+
+.content-page {
+    display: none;
+}
+
+.content-page.active {
+    display: block;
+}
+
+/* Estilos para o card de total de despesas */
+.card.bg-warning {
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+    box-shadow: 0 10px 20px rgba(255, 193, 7, 0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.card.bg-warning:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255, 193, 7, 0.3);
+}
+
+.card.bg-warning::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.card.bg-warning:hover::before {
+    opacity: 1;
+}
+
+.card.bg-warning .card-title {
+    color: #343a40;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.card.bg-warning .card-text {
+    color: #343a40;
+    font-weight: 700;
+    font-size: 2rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Estilos para as abas de período */
+.nav-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+    border-radius: 0;
+    padding: 10px 20px;
+}
+
+.nav-tabs .nav-link.active {
+    color: #ffc107;
+    font-weight: 600;
+    border-bottom: 3px solid #ffc107;
+}
+
+/* Estilos para a tabela de despesas */
+.table {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 2rem;
+}
+
+.table thead th {
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    border-bottom: 2px solid #ffc107;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    padding: 15px;
+    color: #495057;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(255, 193, 7, 0.05);
+    transform: scale(1.01);
+}
+
+.table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+}
+
+/* Estilos para os badges de categoria */
+.badge-categoria {
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.badge-categoria:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Estilos para os botões de ação */
+.btn-acao {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    margin: 0 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.btn-acao:hover {
+    transform: scale(1.2);
+}
+
+.btn-editar:hover {
+    background-color: #17a2b8;
+    color: white;
+    box-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
+}
+
+.btn-excluir:hover {
+    background-color: #dc3545;
+    color: white;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+/* Estilos para os novos elementos da lista de categorias */
+.categoria-color-dot {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.categoria-hover {
+    transform: translateX(5px);
+    background-color: rgba(255, 193, 7, 0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.categoria-item {
+    padding: 10px 0;
+    transition: all 0.3s ease;
+}
+
+.valor-categoria {
+    font-size: 1.1rem;
+    color: #495057;
+}
+
+.percentual-categoria {
+    font-size: 0.8rem;
+}
+
+/* Estilos para os gráficos */
+canvas {
+    max-height: 300px;
+}
+
+/* Estilos para a lista de categorias */
+.lista-categoria-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-left: 4px solid;
+    margin-bottom: 5px;
+    background-color: #f8f9fa;
+}
+
+.lista-categoria-nome {
+    font-weight: 500;
+}
+
+.lista-categoria-valor {
+    font-weight: 600;
+}
+
+/* Estilos para o modal */
+.modal-content {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: #343a40;
+    border-bottom: none;
+    padding: 20px 25px;
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    font-size: 1.3rem;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+}
+
+.modal-header .btn-close {
+    background-color: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+    transition: all 0.3s;
+}
+
+.modal-header .btn-close:hover {
+    background-color: rgba(255,255,255,0.8);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 15px 25px 25px;
+}
+
+.modal-footer .btn {
+    border-radius: 30px;
+    padding: 8px 25px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.modal-footer .btn-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    border: none;
+    color: #343a40;
+    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
+
+.modal-footer .btn-warning:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+}
+
+.modal-footer .btn-secondary {
+    background-color: #e9ecef;
+    border: none;
+    color: #495057;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #dee2e6;
+    transform: translateY(-2px);
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .sidebar {
+        min-height: auto;
+        margin-bottom: 20px;
+    }
+    
+    .row {
+        margin-bottom: 20px;
+    }
+}
