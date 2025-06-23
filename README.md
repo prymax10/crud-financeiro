@@ -41,7 +41,7 @@ primosfincntrl/
 
 1. Clone o repositório:
 ```
-git clone https://github.com/seu-usuario/primosfincntrl.git
+git clone https://github.com/prymax10/crud-financeiro.git
 cd primosfincntrl
 ```
 
