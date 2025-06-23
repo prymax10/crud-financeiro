@@ -90,8 +90,19 @@ const UI = {
         });
         
         // Evento do botão Salvar Despesa
-        document.getElementById('btn-salvar-despesa').addEventListener('click', () => {
-            this.salvarDespesa();
+        document.getElementById('btn-salvar-despesa').addEventListener('click', (event) => {
+            // Evita múltiplos cliques
+            const btnSalvar = event.target;
+            if (btnSalvar.disabled) return;
+            btnSalvar.disabled = true;
+            
+            this.salvarDespesa()
+                .finally(() => {
+                    // Reabilita o botão após a conclusão (sucesso ou erro)
+                    setTimeout(() => {
+                        btnSalvar.disabled = false;
+                    }, 500);
+                });
         });
         
         // Evento para fechar o modal e limpar o formulário
@@ -304,7 +315,7 @@ const UI = {
         // Validação básica
         if (!descricao || !valor || !categoria_id || !data) {
             alert('Por favor, preencha todos os campos.');
-            return;
+            return Promise.reject('Campos incompletos');
         }
         
         // Prepara os dados da despesa
@@ -321,11 +332,20 @@ const UI = {
             : DespesasAPI.criar(despesa);
         
         // Executa a operação
-        promise
+        return promise
             .then(() => {
                 // Fecha o modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('modal-despesa'));
-                modal.hide();
+                if (modal) modal.hide();
+                
+                // Remover backdrop/overlay manualmente se necessário
+                setTimeout(() => {
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                }, 300);
                 
                 // Recarrega as despesas
                 this.carregarDespesas();
@@ -338,6 +358,15 @@ const UI = {
             .catch(error => {
                 console.error('Erro ao salvar despesa:', error);
                 alert('Erro ao salvar despesa. Verifique o console para mais detalhes.');
+                
+                // Remover backdrop mesmo em caso de erro
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                
+                throw error; // Propaga o erro para que o finally no listener seja executado
             });
     },
     
