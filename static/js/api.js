@@ -5,7 +5,8 @@
 
 // Configuração base da API
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:5000/api',
+    // Usa API_BASE_URL definido em api-url-config.js para funcionar em qualquer ambiente
+    BASE_URL: window.API_BASE_URL || `${window.location.origin}/api`,
     
     // Função auxiliar para formatar valores monetários
     formatarMoeda: function(valor) {
