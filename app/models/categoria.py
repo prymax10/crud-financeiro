@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Modelo para manipulação de categorias no banco de dados
+Modelo para manipulação de categorias no banco de dados usando SQLAlchemy
 """
 
-import sqlite3
-from app.models.database import get_db
+from app.models.database import db, Categoria as CategoriaModel
 
 class Categoria:
     """
@@ -21,18 +20,8 @@ class Categoria:
         Returns:
             list: Lista de categorias
         """
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        query = "SELECT id, nome, cor FROM categorias ORDER BY nome"
-        cursor.execute(query)
-        
-        rows = cursor.fetchall()
-        categorias = [dict(row) for row in rows]
-        cursor.close()
-        
-        return categorias
+        categorias = CategoriaModel.query.order_by(CategoriaModel.nome).all()
+        return [categoria.to_dict() for categoria in categorias]
     
     @staticmethod
     def obter_por_id(categoria_id):
@@ -45,15 +34,37 @@ class Categoria:
         Returns:
             dict: Dados da categoria ou None se não encontrada
         """
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
+        categoria = CategoriaModel.query.get(categoria_id)
+        return categoria.to_dict() if categoria else None
+    
+    @staticmethod
+    def criar_categorias_padrao():
+        """
+        Insere categorias padrão se a tabela estiver vazia
         
-        query = "SELECT id, nome, cor FROM categorias WHERE id = ?"
-        cursor.execute(query, (categoria_id,))
-        
-        row = cursor.fetchone()
-        categoria = dict(row) if row else None
-        cursor.close()
-        
-        return categoria
+        Returns:
+            bool: True se as categorias foram criadas, False caso contrário
+        """
+        try:
+            # Verifica se já existem categorias
+            if CategoriaModel.query.count() > 0:
+                return False
+            
+            categorias_padrao = [
+                CategoriaModel(nome='Alimentação', cor='#FF5733'),
+                CategoriaModel(nome='Transporte', cor='#33FF57'),
+                CategoriaModel(nome='Moradia', cor='#3357FF'),
+                CategoriaModel(nome='Saúde', cor='#FF33A8'),
+                CategoriaModel(nome='Educação', cor='#33A8FF'),
+                CategoriaModel(nome='Lazer', cor='#A833FF'),
+                CategoriaModel(nome='Vestuário', cor='#FFD700'),
+                CategoriaModel(nome='Outros', cor='#808080')
+            ]
+            
+            db.session.add_all(categorias_padrao)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao criar categorias padrão: {e}")
+            return False

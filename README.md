@@ -1,52 +1,58 @@
 # Primo'sFinCntrl - Sistema de Controle Financeiro
 
-Sistema de controle financeiro pessoal para gerenciamento de despesas, com visualização de estatísticas e categorização de gastos.
+Sistema de controle financeiro pessoal para gerenciamento de despesas, com visualização de estatísticas e categorização de gastos. Esta versão do sistema está migrada para utilizar MySQL com SQLAlchemy, pronta para deployment na AWS.
 
 ## Estrutura do Projeto
 
 ```
 primosfincntrl/
-├── app/
-│   ├── models/
-│   │   ├── database.py
-│   │   ├── despesa.py
-│   │   ├── categoria.py
-│   │   └── estatistica.py
-│   ├── routes/
-│   │   ├── despesas_routes.py
-│   │   ├── categorias_routes.py
+│── app/
+│   │── models/
+│   │   │── database.py   # Configuração do MySQL com SQLAlchemy
+│   │   │── despesa.py    # Modelo de despesas
+│   │   │── categoria.py  # Modelo de categorias
+│   │   └── estatistica.py # Modelo para estatísticas
+│   │── routes/         # Rotas da API
+│   │   │── despesas_routes.py
+│   │   │── categorias_routes.py
 │   │   └── estatisticas_routes.py
 │   └── services/
-├── static/
-│   ├── css/
+│── static/           # Frontend
+│   │── css/
 │   │   └── style.css
-│   ├── js/
-│   │   ├── api.js
-│   │   ├── ui.js
+│   │── js/
+│   │   │── api.js
+│   │   │── api-url-config.js # Configuração da URL da API
+│   │   │── ui.js
 │   │   └── app.js
 │   └── img/
-├── templates/
+│── templates/
 │   └── index.html
-├── app.py
-└── requirements.txt
+│── app.py            # Arquivo principal da aplicação
+│── init_db.py        # Script para inicialização do banco
+│── requirements.txt   # Dependências Python
+│── Dockerfile         # Build da imagem Docker
+│── docker-compose.yml        # Composição para desenvolvimento
+└── docker-compose.prod.yml   # Composição para produção com RDS
 ```
 
 ## Requisitos
 
 - Python 3.8+
-- MySQL 5.7+
+- MySQL 8.0+
+- Docker e Docker Compose (para implantação)
 - Navegador web moderno
 
-## Instalação
+## Instalação e Execução Local
 
 1. Clone o repositório:
-```
+```bash
 git clone https://github.com/prymax10/crud-financeiro.git
 cd primosfincntrl
 ```
 
 2. Instale as dependências:
-```
+```bash
 pip install -r requirements.txt
 ```
 

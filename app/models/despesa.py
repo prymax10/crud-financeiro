@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
-Modelo para manipulação de despesas no banco de dados
+Modelo para manipulação de despesas no banco de dados usando SQLAlchemy
 """
 
-import sqlite3
-from datetime import datetime
-from app.models.database import get_db
+from datetime import datetime, timedelta
+from app.models.database import db, Despesa as DespesaModel, Categoria as CategoriaModel
+import sqlalchemy as sa
 
 class Despesa:
     """
-    Classe para manipulação de despesas no banco de dados
+    Classe para manipulação de despesas no banco de dados usando SQLAlchemy
     """
     
     @staticmethod
@@ -25,56 +25,41 @@ class Despesa:
         Returns:
             list: Lista de despesas
         """
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
         # Query base
-        query = """
-        SELECT d.id, d.descricao, d.valor, d.data, d.categoria_id,
-               c.nome as categoria_nome, c.cor as categoria_cor
-        FROM despesas d
-        LEFT JOIN categorias c ON d.categoria_id = c.id
-        """
+        query = DespesaModel.query
         
         # Adiciona filtro de período se necessário
-        params = []
+        hoje = datetime.now().date()
+        
         if periodo:
-            hoje = datetime.now().date()
-            
-            hoje_str = hoje.strftime('%Y-%m-%d')
             if periodo == 'diario':
-                query += " WHERE date(d.data) = ?"
-                params.append(hoje_str)
+                # Despesas do dia atual
+                query = query.filter(sa.func.date(DespesaModel.data) == hoje)
             elif periodo == 'semanal':
-                # Considera a semana atual (últimos 7 dias)
-                query += " WHERE date(d.data) >= date(?, '-7 days')"
-                params.append(hoje_str)
+                # Despesas da última semana (7 dias)
+                data_inicio = hoje - timedelta(days=7)
+                query = query.filter(DespesaModel.data >= data_inicio)
             elif periodo == 'mensal':
-                # Considera o mês atual
-                query += " WHERE strftime('%Y-%m', d.data) = strftime('%Y-%m', ?)"
-                params.append(hoje_str)
+                # Despesas do mês atual
+                inicio_mes = datetime(hoje.year, hoje.month, 1).date()
+                query = query.filter(DespesaModel.data >= inicio_mes)
             elif periodo == 'anual':
-                # Considera o ano atual
-                query += " WHERE strftime('%Y', d.data) = strftime('%Y', ?)"
-                params.append(hoje_str)
+                # Despesas do ano atual
+                inicio_ano = datetime(hoje.year, 1, 1).date()
+                query = query.filter(DespesaModel.data >= inicio_ano)
         
         # Ordena por data mais recente
-        query += " ORDER BY d.data DESC"
+        despesas = query.order_by(DespesaModel.data.desc()).all()
         
-        cursor.execute(query, params)
-        despesas = cursor.fetchall()
-        
-        # Converte o resultado para lista de dicionários e formata as datas
+        # Converte em dicionários e formata as datas para formato brasileiro
         result = []
-        for row in despesas:
-            despesa = dict(row)
+        for despesa in despesas:
+            despesa_dict = despesa.to_dict()
             # Formata a data para o formato brasileiro
-            data = datetime.strptime(despesa['data'], '%Y-%m-%d')
-            despesa['data'] = data.strftime('%d/%m/%Y')
-            result.append(despesa)
+            data = datetime.strptime(despesa_dict['data'], '%Y-%m-%d')
+            despesa_dict['data'] = data.strftime('%d/%m/%Y')
+            result.append(despesa_dict)
         
-        cursor.close()
         return result
     
     @staticmethod
@@ -88,28 +73,8 @@ class Despesa:
         Returns:
             dict: Dados da despesa ou None se não encontrada
         """
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        query = """
-        SELECT d.id, d.descricao, d.valor, d.data, d.categoria_id,
-               c.nome as categoria_nome, c.cor as categoria_cor
-        FROM despesas d
-        LEFT JOIN categorias c ON d.categoria_id = c.id
-        WHERE d.id = ?
-        """
-        
-        cursor.execute(query, (despesa_id,))
-        row = cursor.fetchone()
-        
-        despesa = None
-        if row:
-            despesa = dict(row)
-            # A data já está no formato correto para edição em SQLite
-        
-        cursor.close()
-        return despesa
+        despesa = DespesaModel.query.get(despesa_id)
+        return despesa.to_dict() if despesa else None
     
     @staticmethod
     def criar(dados):
@@ -122,34 +87,32 @@ class Despesa:
         Returns:
             int: ID da despesa criada
         """
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        # Garante que o valor seja negativo (despesa)
-        valor = float(dados['valor'])
-        if valor > 0:
-            valor = -valor
-        
-        query = """
-        INSERT INTO despesas (descricao, valor, data, categoria_id)
-        VALUES (?, ?, ?, ?)
-        """
-        
-        cursor.execute(
-            query,
-            (
-                dados['descricao'],
-                valor,
-                dados['data'],
-                dados['categoria_id']
+        try:
+            # Garante que o valor seja negativo (despesa)
+            valor = float(dados['valor'])
+            if valor > 0:
+                valor = -valor
+            
+            # Converte a data de string para objeto date
+            data_obj = datetime.strptime(dados['data'], '%Y-%m-%d').date()
+            
+            # Cria o objeto despesa
+            nova_despesa = DespesaModel(
+                descricao=dados['descricao'],
+                valor=valor,
+                data=data_obj,
+                categoria_id=dados['categoria_id']
             )
-        )
-        
-        despesa_id = cursor.lastrowid
-        conn.commit()
-        cursor.close()
-        
-        return despesa_id
+            
+            # Salva no banco de dados
+            db.session.add(nova_despesa)
+            db.session.commit()
+            
+            return nova_despesa.id
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao criar despesa: {e}")
+            raise
     
     @staticmethod
     def atualizar(despesa_id, dados):
@@ -163,36 +126,32 @@ class Despesa:
         Returns:
             bool: True se atualizado com sucesso, False caso contrário
         """
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        # Garante que o valor seja negativo (despesa)
-        valor = float(dados['valor'])
-        if valor > 0:
-            valor = -valor
-        
-        query = """
-        UPDATE despesas
-        SET descricao = ?, valor = ?, data = ?, categoria_id = ?
-        WHERE id = ?
-        """
-        
-        cursor.execute(
-            query,
-            (
-                dados['descricao'],
-                valor,
-                dados['data'],
-                dados['categoria_id'],
-                despesa_id
-            )
-        )
-        
-        success = cursor.rowcount > 0
-        conn.commit()
-        cursor.close()
-        
-        return success
+        try:
+            despesa = DespesaModel.query.get(despesa_id)
+            if not despesa:
+                return False
+            
+            # Garante que o valor seja negativo (despesa)
+            valor = float(dados['valor'])
+            if valor > 0:
+                valor = -valor
+            
+            # Converte a data de string para objeto date
+            data_obj = datetime.strptime(dados['data'], '%Y-%m-%d').date()
+            
+            # Atualiza os campos
+            despesa.descricao = dados['descricao']
+            despesa.valor = valor
+            despesa.data = data_obj
+            despesa.categoria_id = dados['categoria_id']
+            
+            # Salva as alterações
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao atualizar despesa: {e}")
+            return False
     
     @staticmethod
     def excluir(despesa_id):
@@ -203,16 +162,18 @@ class Despesa:
             despesa_id (int): ID da despesa
         
         Returns:
-            bool: True se excluída com sucesso, False caso contrário
+            bool: True se excluído com sucesso, False caso contrário
         """
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        query = "DELETE FROM despesas WHERE id = ?"
-        cursor.execute(query, (despesa_id,))
-        
-        success = cursor.rowcount > 0
-        conn.commit()
-        cursor.close()
-        
-        return success
+        try:
+            despesa = DespesaModel.query.get(despesa_id)
+            if not despesa:
+                return False
+            
+            # Remove a despesa
+            db.session.delete(despesa)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao excluir despesa: {e}")
+            return False

@@ -5,14 +5,18 @@
 
 // Função para obter a URL base da API
 function getApiBaseUrl() {
-    // Em produção: usa o mesmo domínio (window.location.origin)
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    // Verifica se está em ambiente de produção (AWS)
+    if (window.location.hostname === 'crud-finance-alb-233355946.us-east-2.elb.amazonaws.com') {
+        // Usa o DNS do Load Balancer
+        return `http://crud-finance-alb-233355946.us-east-2.elb.amazonaws.com/api`;
+    }
+    // Verifica se é outro ambiente de produção
+    else if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         return `${window.location.origin}/api`;
     } 
-    // Em desenvolvimento local: usa a porta específica do backend
+    // Em desenvolvimento local: usa a porta local
     else {
-        // Porta do backend em ambiente de desenvolvimento (padrão: 5000)
-        return `${window.location.origin}/api`;
+        return 'http://localhost:5000/api';
     }
 }
 

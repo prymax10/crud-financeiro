@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
-Modelo para geração de estatísticas a partir das despesas
+Modelo para geração de estatísticas a partir das despesas usando SQLAlchemy
 """
 
-import sqlite3
-from app.models.database import get_db
-from datetime import datetime
+from app.models.database import db, Despesa as DespesaModel, Categoria as CategoriaModel
+from datetime import datetime, timedelta
+import sqlalchemy as sa
 
 class Estatistica:
     """
-    Classe para geração de estatísticas a partir das despesas
+    Classe para geração de estatísticas a partir das despesas usando SQLAlchemy
     """
     
     @staticmethod
@@ -25,38 +25,30 @@ class Estatistica:
         Returns:
             float: Total de despesas
         """
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
         # Query base
-        query = "SELECT SUM(valor) FROM despesas"
+        query = db.session.query(sa.func.sum(DespesaModel.valor))
         
         # Adiciona filtro de período se necessário
-        params = []
-        if periodo:
-            hoje = datetime.now().date()
-            
-            hoje_str = hoje.strftime('%Y-%m-%d')
-            if periodo == 'diario':
-                query += " WHERE date(data) = ?"
-                params.append(hoje_str)
-            elif periodo == 'semanal':
-                # Considera a semana atual (últimos 7 dias)
-                query += " WHERE date(data) >= date(?, '-7 days')"
-                params.append(hoje_str)
-            elif periodo == 'mensal':
-                # Considera o mês atual
-                query += " WHERE strftime('%Y-%m', data) = strftime('%Y-%m', ?)"
-                params.append(hoje_str)
-            elif periodo == 'anual':
-                # Considera o ano atual
-                query += " WHERE strftime('%Y', data) = strftime('%Y', ?)"
-                params.append(hoje_str)
+        hoje = datetime.now().date()
         
-        cursor.execute(query, params)
-        total = cursor.fetchone()[0]
-        cursor.close()
+        if periodo:
+            if periodo == 'diario':
+                # Despesas do dia atual
+                query = query.filter(sa.func.date(DespesaModel.data) == hoje)
+            elif periodo == 'semanal':
+                # Despesas da última semana (7 dias)
+                data_inicio = hoje - timedelta(days=7)
+                query = query.filter(DespesaModel.data >= data_inicio)
+            elif periodo == 'mensal':
+                # Despesas do mês atual
+                inicio_mes = datetime(hoje.year, hoje.month, 1).date()
+                query = query.filter(DespesaModel.data >= inicio_mes)
+            elif periodo == 'anual':
+                # Despesas do ano atual
+                inicio_ano = datetime(hoje.year, 1, 1).date()
+                query = query.filter(DespesaModel.data >= inicio_ano)
+        
+        total = query.scalar()
         
         # Se não houver despesas, retorna 0
         return float(total) if total else 0.0
@@ -72,54 +64,56 @@ class Estatistica:
         Returns:
             list: Lista de despesas por categoria
         """
-        conn = get_db()
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        # Query base
-        query = """
-        SELECT c.id, c.nome, c.cor, SUM(d.valor) as total
-        FROM despesas d
-        JOIN categorias c ON d.categoria_id = c.id
-        """
+        # Query base para selecionar id, nome, cor da categoria e o total de despesas
+        query = db.session.query(
+            CategoriaModel.id,
+            CategoriaModel.nome,
+            CategoriaModel.cor,
+            sa.func.sum(DespesaModel.valor).label('total')
+        ).join(DespesaModel, CategoriaModel.id == DespesaModel.categoria_id)
         
         # Adiciona filtro de período se necessário
-        params = []
+        hoje = datetime.now().date()
+        
         if periodo:
-            hoje = datetime.now().date()
-            
-            hoje_str = hoje.strftime('%Y-%m-%d')
             if periodo == 'diario':
-                query += " WHERE date(d.data) = ?"
-                params.append(hoje_str)
+                # Despesas do dia atual
+                query = query.filter(sa.func.date(DespesaModel.data) == hoje)
             elif periodo == 'semanal':
-                # Considera a semana atual (últimos 7 dias)
-                query += " WHERE date(d.data) >= date(?, '-7 days')"
-                params.append(hoje_str)
+                # Despesas da última semana (7 dias)
+                data_inicio = hoje - timedelta(days=7)
+                query = query.filter(DespesaModel.data >= data_inicio)
             elif periodo == 'mensal':
                 # Considera o mês atual
-                query += " WHERE strftime('%Y-%m', d.data) = strftime('%Y-%m', ?)"
-                params.append(hoje_str)
+                inicio_mes = datetime(hoje.year, hoje.month, 1).date()
+                query = query.filter(DespesaModel.data >= inicio_mes)
             elif periodo == 'anual':
                 # Considera o ano atual
-                query += " WHERE strftime('%Y', d.data) = strftime('%Y', ?)"
-                params.append(hoje_str)
+                inicio_ano = datetime(hoje.year, 1, 1).date()
+                query = query.filter(DespesaModel.data >= inicio_ano)
         
-        # Agrupa por categoria e ordena pelo total (maior para menor)
-        query += " GROUP BY c.id, c.nome, c.cor ORDER BY total ASC"
+        # Agrupa por categoria e ordena pelo valor absoluto das despesas (decrescente)
+        query = query.group_by(CategoriaModel.id, CategoriaModel.nome, CategoriaModel.cor)
+        query = query.order_by(sa.desc(sa.func.abs(sa.func.sum(DespesaModel.valor))))
         
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
+        results = query.all()
         
-        # Converte para lista de dicionários
-        categorias = [dict(row) for row in rows]
+        # Formata o resultado
+        categorias_despesas = []
+        for result in results:
+            categorias_despesas.append({
+                'id': result.id,
+                'nome': result.nome,
+                'cor': result.cor,
+                'total': float(result.total) if result.total else 0.0
+            })
         
         # Calcula o total geral para percentuais
-        total_geral = sum(abs(float(cat['total'])) for cat in categorias)
+        total_geral = sum(abs(float(cat['total'])) for cat in categorias_despesas)
         
         # Adiciona o percentual para cada categoria
-        for cat in categorias:
+        for cat in categorias_despesas:
             cat['percentual'] = round(abs(float(cat['total'])) / total_geral * 100, 2) if total_geral > 0 else 0
             cat['total'] = abs(float(cat['total']))  # Converte para positivo para exibição e serialização JSON
         
-        return categorias
+        return categorias_despesas
