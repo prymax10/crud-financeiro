@@ -45,12 +45,12 @@ Este projeto consiste em uma aplicação web (backend + frontend) para controle 
 
 - **EC2-A (principal)**
   - Nome: `crud-finance-ec2-a`
-  - IP Público: `18.223.100.79`
+  - IP Público: `18.216.31.131`
   - Zona: `us-east-2a`
   - Rodando containers do backend e frontend
 - **EC2-B (reserva)**
   - Nome: `crud-finance-ec2-b`
-  - IP Público: `3.145.2.8`
+  - IP Público: `3.23.102.54`
   - Zona: `us-east-2b`
   - Configuração idêntica à EC2-A (docker-compose com .env)
 
