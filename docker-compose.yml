@@ -1,4 +1,4 @@
-version: '3.8'
+ 
 
 # Docker Compose para uso direto com EC2 e RDS MySQL
 
@@ -6,7 +6,7 @@ services:
   app:
     build: .
     ports:
-      - "5000:5000"
+      - "80:5000"
     environment:
       - FLASK_ENV=production
       # Configure as variáveis de ambiente para o RDS AWS

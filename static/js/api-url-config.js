@@ -16,7 +16,8 @@ function getApiBaseUrl() {
     } 
     // Em desenvolvimento local: usa a porta local
     else {
-        return 'http://localhost:5000/api';
+        return 'http://localhost/api';
+        
     }
 }
 
