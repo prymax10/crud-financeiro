@@ -70,7 +70,7 @@ Este projeto consiste em uma aplicação web (backend + frontend) para controle 
 - Público: `false` (acesso apenas via EC2)
 - Banco: `crud_financeiro`
 - Usuário: `admin`
-- Senha: `Devopscrud25` (armazenada no `.env`)
+- Senha: `*******` (armazenada no `.env`)
 
 ---
 
