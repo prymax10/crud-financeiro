@@ -6,7 +6,8 @@
 // Configuração base da API
 const API_CONFIG = {
     // Usa API_BASE_URL definido em api-url-config.js para funcionar em qualquer ambiente
-    BASE_URL: window.API_BASE_URL || `${window.location.origin}/api`,
+    BASE_URL: 'http://crud-finance-alb-233355946.us-east-2.elb.amazonaws.com/api'
+,
     
     // Função auxiliar para formatar valores monetários
     formatarMoeda: function(valor) {

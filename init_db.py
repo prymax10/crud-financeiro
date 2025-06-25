@@ -7,6 +7,7 @@ Cria tabelas e insere dados iniciais automaticamente
 """
 
 import os
+import mysql.connector
 from flask import Flask
 from app.models.database import db, init_db
 from dotenv import load_dotenv
@@ -14,10 +15,32 @@ from dotenv import load_dotenv
 # Carrega as variáveis de ambiente
 load_dotenv()
 
+def criar_banco_se_nao_existir():
+    """
+    Conecta ao MySQL e cria o banco se não existir
+    """
+    host = os.getenv("DB_HOST")
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASSWORD")
+    db_name = os.getenv("DB_NAME")
+
+    conexao = mysql.connector.connect(
+        host=host,
+        user=user,
+        password=password
+    )
+
+    cursor = conexao.cursor()
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name}")
+    conexao.close()
+    print(f"✅ Banco '{db_name}' verificado/criado com sucesso.")
+
 def init_database():
     """
     Inicializa o banco de dados, criando tabelas e categorias padrão
     """
+    criar_banco_se_nao_existir()
+
     # Cria uma instância da aplicação Flask
     app = Flask(__name__)
     
@@ -62,3 +85,4 @@ def init_database():
 
 if __name__ == "__main__":
     init_database()
+

@@ -1,15 +1,12 @@
- 
-
-# Docker Compose para uso direto com EC2 e RDS MySQL
-
 services:
   app:
     build: .
     ports:
       - "80:5000"
+    env_file:
+      - .env
     environment:
       - FLASK_ENV=production
-      # Configure as variáveis de ambiente para o RDS AWS
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
@@ -17,4 +14,3 @@ services:
       - DB_NAME=${DB_NAME:-primosfincntrl}
     restart: always
 
-# Não há serviço de banco de dados local, pois usaremos o RDS
