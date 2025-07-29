@@ -53,7 +53,7 @@ def init_database():
         print("✅ Tabelas criadas com sucesso!")
         
         # Cria categorias padrão manualmente
-        from app.models.categoria import Categoria
+        from app.models.database import Categoria
         
         categorias = [
             {"nome": "Alimentação", "cor": "#FF5733"},
