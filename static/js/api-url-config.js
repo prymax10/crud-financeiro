@@ -10,14 +10,18 @@ function getApiBaseUrl() {
         // Usa o DNS do Load Balancer
         return `http://crud-finance-alb-233355946.us-east-2.elb.amazonaws.com/api`;
     }
+    // Verifica se é outro ambiente de produção (ALB da AWS)
+    else if (window.location.hostname.includes('elb.amazonaws.com') || 
+             window.location.hostname.includes('alb.amazonaws.com')) {
+        return `${window.location.origin}/api`;
+    }
     // Verifica se é outro ambiente de produção
     else if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         return `${window.location.origin}/api`;
     } 
     // Em desenvolvimento local: usa a porta local
     else {
-        return 'http://localhost/api';
-        
+        return 'http://localhost:5000/api';
     }
 }
 
