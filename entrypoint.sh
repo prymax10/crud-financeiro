@@ -4,21 +4,6 @@ set -e
 echo "=== PRIMOSFINCNTRL CONTAINER STARTUP ==="
 echo "Timestamp: $(date)"
 
-# Função para instalar dependências necessárias
-install_dependencies() {
-    echo "Verificando e instalando dependências..."
-    
-    # Verifica se o MySQL client está instalado
-    if ! command -v mysql &> /dev/null; then
-        echo "MySQL client não encontrado. Instalando..."
-        apt-get update
-        apt-get install -y default-mysql-client
-        echo "✅ MySQL client instalado com sucesso!"
-    else
-        echo "✅ MySQL client já está instalado."
-    fi
-}
-
 # Função para aguardar o banco de dados estar disponível
 wait_for_db() {
     echo "Aguardando banco de dados estar disponível..."
@@ -47,10 +32,6 @@ health_check() {
         return 1
     fi
 }
-
-# Instalar dependências (como root)
-echo "🔧 Instalando dependências..."
-install_dependencies
 
 # Aguardar banco de dados
 echo "🔄 Aguardando banco de dados..."
