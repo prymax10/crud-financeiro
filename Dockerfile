@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     pkg-config \
     curl \
-    mysql-client \
+    default-mysql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
