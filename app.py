@@ -44,7 +44,14 @@ def index():
 @app.route('/ping', methods=['GET'])
 def ping():
     """Endpoint para verificar se a API está funcionando"""
-    return jsonify({"message": "pong"})
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return jsonify({
+        "message": "pong", 
+        "timestamp": timestamp,
+        "version": "2.0.0",
+        "status": "rolling-update-test"
+    })
 
 # Tratamento de erros
 @app.errorhandler(404)
