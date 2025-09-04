@@ -49,7 +49,7 @@ ENV DB_PORT=3306
 ENV DB_NAME=primosfincntrl
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:5000/ping || exit 1
 
 # Comando para iniciar a aplicação em produção (0.0.0.0 para permitir acesso externo)
