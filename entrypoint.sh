@@ -7,7 +7,7 @@ echo "Timestamp: $(date)"
 # Função para aguardar o banco de dados estar disponível
 wait_for_db() {
     echo "Aguardando banco de dados estar disponível..."
-    while ! mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
+    while ! mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASSWORD" --ssl=0 -e "SELECT 1" >/dev/null 2>&1; do
         echo "Banco de dados não está disponível ainda. Aguardando..."
         sleep 5
     done
