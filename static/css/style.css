@@ -421,6 +421,21 @@ select.form-select {
     z-index: 9999 !important;
 }
 
+/* Estilo para o dropdown custom */
+.dropdown-menu {
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 2000; /* acima dos inputs (1050) e do modal (1050) */
+}
+
+.dropdown {
+    position: relative; /* cria contexto para o z-index do menu */
+}
+
+#categoriaDropdownBtn {
+    text-align: left;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .sidebar {

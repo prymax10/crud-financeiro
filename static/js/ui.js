@@ -159,26 +159,40 @@ const UI = {
      * Preenche o select de categorias no formulário
      */
     preencherSelectCategorias: function() {
+        // Preenche o select (mesmo oculto) para manter a compatibilidade
         const select = document.getElementById('despesa-categoria');
-        
-        // Limpa as opções existentes
         select.innerHTML = '<option value="">Selecione uma categoria</option>';
-        
-        // Adiciona as categorias como opções
+
+        // Também popula o dropdown custom
+        const menu = document.getElementById('categoriaDropdownMenu');
+        const btn = document.getElementById('categoriaDropdownBtn');
+        menu.innerHTML = '';
+
         this.state.categorias.forEach(categoria => {
+            // option para o select oculto
             const option = document.createElement('option');
             option.value = categoria.id;
             option.textContent = categoria.nome;
             option.style.color = categoria.cor;
             select.appendChild(option);
-        });
 
-        // Workaround: força o reflow e z-index corretos no <select> dentro do modal
-        // para evitar que o menu abra no canto superior esquerdo em alguns ambientes
-        select.style.position = 'relative';
-        select.style.zIndex = '1060';
-        // Força reflow
-        void select.offsetHeight;
+            // item para o dropdown custom
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.className = 'dropdown-item d-flex align-items-center';
+            a.href = '#';
+            a.dataset.value = categoria.id;
+            a.innerHTML = `<span class="categoria-color-dot me-2" style="background-color: ${categoria.cor}"></span>${categoria.nome}`;
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Atualiza select oculto
+                select.value = categoria.id;
+                // Atualiza label do botão
+                btn.textContent = categoria.nome;
+            });
+            li.appendChild(a);
+            menu.appendChild(li);
+        });
     },
     
     /**

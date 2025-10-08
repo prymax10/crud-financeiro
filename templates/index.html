@@ -176,9 +176,19 @@
                         </div>
                         <div class="mb-3">
                             <label for="despesa-categoria" class="form-label">Categoria</label>
-                            <select class="form-select" id="despesa-categoria" required>
+                            <!-- Select original mantido oculto para integração com a lógica existente -->
+                            <select class="form-select d-none" id="despesa-categoria" required>
                                 <!-- Opções serão carregadas via JavaScript -->
                             </select>
+                            <!-- Dropdown custom para evitar bug do select nativo no modal -->
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="categoriaDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Selecione uma categoria
+                                </button>
+                                <ul class="dropdown-menu w-100" aria-labelledby="categoriaDropdownBtn" id="categoriaDropdownMenu">
+                                    <!-- Itens serão carregados via JavaScript -->
+                                </ul>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="despesa-data" class="form-label">Data</label>
