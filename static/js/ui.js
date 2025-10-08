@@ -172,6 +172,13 @@ const UI = {
             option.style.color = categoria.cor;
             select.appendChild(option);
         });
+
+        // Workaround: força o reflow e z-index corretos no <select> dentro do modal
+        // para evitar que o menu abra no canto superior esquerdo em alguns ambientes
+        select.style.position = 'relative';
+        select.style.zIndex = '1060';
+        // Força reflow
+        void select.offsetHeight;
     },
     
     /**

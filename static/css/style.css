@@ -292,7 +292,7 @@ canvas {
     border: none;
     border-radius: 15px;
     box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-    overflow: hidden;
+    overflow: visible; /* Fix para dropdown no modal */
 }
 
 .modal-header {
@@ -323,6 +323,7 @@ canvas {
 
 .modal-body {
     padding: 25px;
+    overflow: visible; /* Fix para dropdown no modal */
 }
 
 .modal-footer {
@@ -365,11 +366,59 @@ canvas {
     padding: 10px 15px;
     border: 1px solid #ced4da;
     transition: all 0.3s;
+    position: relative;
+    z-index: 1050; /* Fix para dropdown no modal */
 }
 
 .form-control:focus, .form-select:focus {
     border-color: #ffc107;
     box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+}
+
+/* Fix específico para dropdowns no modal */
+.modal-body .form-select {
+    position: relative;
+    z-index: 1060;
+}
+
+/* Fix mais específico para o problema do dropdown */
+.modal {
+    overflow: visible !important;
+}
+
+.modal-dialog {
+    overflow: visible !important;
+}
+
+.modal-dialog {
+    /* Corrige bug de posicionamento do dropdown do <select> em alguns navegadores
+       quando há transform aplicado no ancestral do modal */
+    transform: none !important;
+}
+
+.modal.fade .modal-dialog {
+    transform: none !important; /* desativa animação que aplica translate() */
+}
+
+.modal-content {
+    overflow: visible !important;
+}
+
+.modal-body {
+    overflow: visible !important;
+    position: relative;
+}
+
+/* Garantir que o select tenha o comportamento correto */
+#despesa-categoria {
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+/* Fix para o dropdown do select */
+select.form-select {
+    position: relative !important;
+    z-index: 9999 !important;
 }
 
 /* Responsividade */
