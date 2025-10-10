@@ -1,0 +1,43 @@
+name: Render Mermaid diagrams
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/*.mmd'
+      - '.github/workflows/render-mermaid.yml'
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Render diagrams
+        run: |
+          mmdc -i docs/arquitetura.mmd -o docs/arquitetura.png
+
+      - name: Commit and push PNG if changed
+        run: |
+          if [[ -n "$(git status --porcelain docs/arquitetura.png)" ]]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@users.noreply.github.com"
+            git add docs/arquitetura.png
+            git commit -m "docs: render arquitetura.png from Mermaid"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+

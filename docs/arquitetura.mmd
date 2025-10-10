@@ -1,0 +1,11 @@
+graph LR
+  A[Cliente Web] -- HTTP --> ALB[AWS ALB]
+  ALB -- HTTP --> EC2A[EC2 A - Docker]
+  ALB -- HTTP --> EC2B[EC2 B - Docker]
+  subgraph Container
+    API[Flask API + Frontend estático]
+  end
+  EC2A --> API
+  EC2B --> API
+  API -- SQL --> RDS[(MySQL RDS)]
+  SM[AWS Secrets Manager] -. credenciais .-> API
